@@ -12,7 +12,7 @@ const GENERAL_SCHEMA = [
                 key: 'show_quick_button',
                 type: 'switch',
                 label: '视频页面显示下载按钮',
-                note: '在播放页左下角显示快速下载入口'
+                note: '在播放页显示快速下载入口，位置可在「个性化」中调整'
             },
             {
                 key: 'task_interval',
