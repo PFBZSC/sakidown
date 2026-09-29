@@ -19,6 +19,16 @@
  */
 
 const FAB_HOST_ID = 'saki-fab-container';
+const FAB_OFFSET = '24px';
+
+function applyFabPosition(host, position) {
+    if (!host) return;
+
+    const isRight = position === 'right';
+
+    host.style.left = isRight ? '' : FAB_OFFSET;
+    host.style.right = isRight ? FAB_OFFSET : '';
+}
 
 const injectAdapter = () => {
     const script = document.createElement('script');
@@ -71,10 +81,14 @@ const ui = new window.UIManager();
 let activeTrigger = null;
 
 async function initQuickButton() {
-    try {
-        const { show_quick_button: show_quick_button } = await chrome.storage.local.get(['show_quick_button']);
+    let fabPosition = 'left';
 
-        if (show_quick_button === false) return;
+    try {
+        const config = await chrome.storage.local.get(['show_quick_button', 'fab_position']);
+
+        if (config.show_quick_button === false) return;
+
+        fabPosition = config.fab_position;
     } catch (e) {
         console.warn('[SakiDown] Config load failed, using default', e);
     }
@@ -87,9 +101,9 @@ async function initQuickButton() {
 
     host.id = FAB_HOST_ID;
     host.style.position = 'fixed';
-    host.style.bottom = '24px';
-    host.style.left = '24px';
+    host.style.bottom = FAB_OFFSET;
     host.style.zIndex = '100000';
+    applyFabPosition(host, fabPosition);
     document.body.appendChild(host);
     const shadow = host.attachShadow({ mode: 'open' });
 
@@ -148,6 +162,11 @@ chrome.storage.onChanged.addListener((changes, area) => {
             if (el) el.remove();
         }
     }
+});
+chrome.storage.onChanged.addListener((changes, area) => {
+    if (area !== 'local' || !changes.fab_position) return;
+
+    applyFabPosition(document.getElementById(FAB_HOST_ID), changes.fab_position.newValue);
 });
 window.addEventListener('message', (event) => {
     if (event.source !== window || !event.data || event.data.source !== 'SakiDown') return;
