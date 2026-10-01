@@ -18,7 +18,7 @@
  * @version v0.1.0
  */
 
-const DEFAULT_CONFIG = { user_theme: 'default', show_quick_button: true };
+const DEFAULT_CONFIG = { user_theme: 'default', show_quick_button: true, fab_position: 'left' };
 
 import { downloadEngine } from './download-engine.js';
 import { setupInterceptor } from './stream-interceptor.js';
@@ -31,13 +31,17 @@ import { StoragePipeline } from '../core/storage-pipeline.js';
 import { exportManager } from './export-manager.js';
 
 function initializeConfig() {
-    chrome.storage.local.get(['user_theme', 'task_interval', 'show_quick_button'], (result) => {
+    chrome.storage.local.get(['user_theme', 'task_interval', 'show_quick_button', 'fab_position'], (result) => {
         if (!result.user_theme) {
             chrome.storage.local.set({ user_theme: DEFAULT_CONFIG.user_theme });
         }
 
         if (result.show_quick_button === undefined) {
             chrome.storage.local.set({ show_quick_button: DEFAULT_CONFIG.show_quick_button });
+        }
+
+        if (result.fab_position === undefined) {
+            chrome.storage.local.set({ fab_position: DEFAULT_CONFIG.fab_position });
         }
 
         const interval = result.task_interval !== undefined ? result.task_interval : 5;
